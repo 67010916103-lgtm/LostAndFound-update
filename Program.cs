@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+Ôªøusing Microsoft.EntityFrameworkCore;
 using LostAndFound.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register ApplicationDbContext (‡ª≈’Ë¬π®“° UseSqlServer ¡“„™È UseInMemoryDatabase)
+// Register ApplicationDbContext (‡πÄ‡∏õ‡∏•‡∏µ‡πà‡∏¢‡∏ô‡∏à‡∏≤‡∏Å UseSqlServer ‡∏°‡∏≤‡πÉ‡∏ä‡πâ UseInMemoryDatabase)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseInMemoryDatabase("LostAndFoundDb"));
 
@@ -30,22 +30,22 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Item}/{action=Index}/{id?}");
 
-// ∑”°“√ √È“ß¢ÈÕ¡Ÿ≈‡√‘Ë¡µÈπ (Categories)
+// ‡∏ó‡∏≥‡∏Å‡∏≤‡∏£‡∏™‡∏£‡πâ‡∏≤‡∏á‡∏Ç‡πâ‡∏≠‡∏°‡∏π‡∏•‡πÄ‡∏£‡∏¥‡πà‡∏°‡∏ï‡πâ‡∏ô (Categories)
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<LostAndFound.Data.ApplicationDbContext>();
-        context.Database.EnsureCreated(); //  √È“ß∞“π¢ÈÕ¡Ÿ≈®”≈Õß„π·√¡
+        context.Database.EnsureCreated(); // ‡∏™‡∏£‡πâ‡∏≤‡∏á‡∏ê‡∏≤‡∏ô‡∏Ç‡πâ‡∏≠‡∏°‡∏π‡∏•‡∏à‡∏≥‡∏•‡∏≠‡∏á‡πÉ‡∏ô‡πÅ‡∏£‡∏°
 
         if (!context.Categories.Any())
         {
             context.Categories.AddRange(
-                new LostAndFound.Models.Category { Name = "Õÿª°√≥ÏÕ‘‡≈Á°∑√Õπ‘° Ï" },
-                new LostAndFound.Models.Category { Name = "‡Õ° “√ / °√–‡ªÎ“ µ“ß§Ï" },
-                new LostAndFound.Models.Category { Name = "‡ ◊ÈÕºÈ“ / ‡§√◊ËÕß·µËß°“¬" },
-                new LostAndFound.Models.Category { Name = "°ÿ≠·®" },
-                new LostAndFound.Models.Category { Name = "Õ◊ËπÊ" }
+                new LostAndFound.Models.Category { Name = "‡∏≠‡∏∏‡∏õ‡∏Å‡∏£‡∏ì‡πå‡∏≠‡∏¥‡πÄ‡∏•‡πá‡∏Å‡∏ó‡∏£‡∏≠‡∏ô‡∏¥‡∏Å‡∏™‡πå" },
+                new LostAndFound.Models.Category { Name = "‡πÄ‡∏≠‡∏Å‡∏™‡∏≤‡∏£ / ‡∏Å‡∏£‡∏∞‡πÄ‡∏õ‡πã‡∏≤‡∏™‡∏ï‡∏≤‡∏á‡∏Ñ‡πå" },
+                new LostAndFound.Models.Category { Name = "‡πÄ‡∏™‡∏∑‡πâ‡∏≠‡∏ú‡πâ‡∏≤ / ‡πÄ‡∏Ñ‡∏£‡∏∑‡πà‡∏≠‡∏á‡πÅ‡∏ï‡πà‡∏á‡∏Å‡∏≤‡∏¢" },
+                new LostAndFound.Models.Category { Name = "‡∏Å‡∏∏‡∏ç‡πÅ‡∏à" },
+                new LostAndFound.Models.Category { Name = "‡∏≠‡∏∑‡πà‡∏ô‡πÜ" }
             );
             context.SaveChanges();
         }
