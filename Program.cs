@@ -31,19 +31,28 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Item}/{action=Index}/{id?}");
 
+// ทำการหุ้ม try-catch ป้องกันโปรแกรมดับเมื่อยังไม่ได้เชื่อมต่อ Database บน Cloud
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<LostAndFound.Data.ApplicationDbContext>();
-    if (!context.Categories.Any())
+    try
     {
-        context.Categories.AddRange(
-            new LostAndFound.Models.Category { Name = "อุปกรณ์อิเล็กทรอนิกส์" },
-            new LostAndFound.Models.Category { Name = "เอกสาร / กระเป๋าสตางค์" },
-            new LostAndFound.Models.Category { Name = "เสื้อผ้า / เครื่องแต่งกาย" },
-            new LostAndFound.Models.Category { Name = "กุญแจ" },
-            new LostAndFound.Models.Category { Name = "อื่นๆ" }
-        );
-        context.SaveChanges();
+        var context = scope.ServiceProvider.GetRequiredService<LostAndFound.Data.ApplicationDbContext>();
+        if (context.Database.CanConnect() && !context.Categories.Any())
+        {
+            context.Categories.AddRange(
+                new LostAndFound.Models.Category { Name = "อุปกรณ์อิเล็กทรอนิกส์" },
+                new LostAndFound.Models.Category { Name = "เอกสาร / กระเป๋าสตางค์" },
+                new LostAndFound.Models.Category { Name = "เสื้อผ้า / เครื่องแต่งกาย" },
+                new LostAndFound.Models.Category { Name = "กุญแจ" },
+                new LostAndFound.Models.Category { Name = "อื่นๆ" }
+            );
+            context.SaveChanges();
+        }
+    }
+    catch (Exception ex)
+    {
+        // หากเชื่อมต่อฐานข้อมูลไม่ได้ ให้ข้ามไปรันแอปตามปกติ
+        Console.WriteLine($"Database initialization bypassed: {ex.Message}");
     }
 }
 
