@@ -1,0 +1,136 @@
+﻿@model LostAndFound.Models.Item
+
+@{
+    ViewData["Title"] = "รายละเอียดสิ่งของ";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .card-custom {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+    }
+
+    .header-gradient {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 20px;
+    }
+</style>
+
+<div class="container my-5" style="max-width: 800px;">
+    <div class="card card-custom">
+        <div class="header-gradient d-flex justify-content-between align-items-center">
+            <h3 class="mb-0 fw-bold"><i class="bi bi-info-circle-fill me-2"></i>รายละเอียดสิ่งของ</h3>
+            <div>
+                <span class="badge @(Model.Type == LostAndFound.Models.ItemType.Found ? "bg-success" : "bg-danger") fs-6 me-1">
+                    @Html.DisplayFor(m => Model.Type)
+                </span>
+                @if (Model.Status == LostAndFound.Models.ItemStatus.Returned || Model.Status == LostAndFound.Models.ItemStatus.Claimed)
+                {
+                    <span class="badge bg-secondary fs-6">
+                        <i class="bi bi-check-circle-fill me-1"></i> ส่งคืนแล้ว
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-5 mb-3 text-center">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" class="img-fluid rounded shadow-sm w-100" style="max-height: 300px; object-fit: cover;" alt="@Model.Title" />
+                    }
+                    else
+                    {
+                        <div class="bg-light d-flex align-items-center justify-content-center rounded shadow-sm" style="height: 250px;">
+                            <i class="bi bi-image text-muted display-1"></i>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-7">
+                    <h2 class="fw-bold text-primary mb-3">@Model.Title</h2>
+
+                    <div class="mb-2">
+                        <span class="fw-semibold text-secondary">หมวดหมู่:</span>
+                        <span class="badge bg-secondary ms-1">@(Model.Category?.Name ?? "ไม่ระบุ")</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <span class="fw-semibold text-secondary">สถานที่:</span>
+                        <span class="text-dark"><i class="bi bi-geo-alt-fill text-danger me-1"></i>@Model.Location</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <span class="fw-semibold text-secondary">วันที่เกิดเหตุ:</span>
+                        <span class="text-dark">@Model.EventDate.ToString("dd/MM/yyyy HH:mm") น.</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="fw-semibold text-secondary">สถานะประกาศ:</span>
+                        @if (Model.Status == LostAndFound.Models.ItemStatus.Returned || Model.Status == LostAndFound.Models.ItemStatus.Claimed)
+                        {
+                            <span class="badge bg-secondary ms-1">มีผู้รับ / ส่งคืนเรียบร้อยแล้ว</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark ms-1">กำลังตามหา / รอดำเนินการ</span>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-dark">รายละเอียดเพิ่มเติม:</h6>
+                        <p class="text-muted bg-light p-3 rounded">@Model.Description</p>
+                    </div>
+
+                    <hr />
+
+                    <div class="p-3 bg-light rounded border border-info">
+                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-person-lines-fill me-1"></i>ข้อมูลผู้แจ้ง / ช่องทางติดต่อ</h6>
+                        <p class="mb-1"><strong>สถานะผู้แจ้ง:</strong> @Html.DisplayFor(m => Model.ReporterType)</p>
+                        <p class="mb-1"><strong>รหัสนิสิต / บุคลากร:</strong> @(string.IsNullOrEmpty(Model.StudentId) ? "-" : Model.StudentId)</p>
+                        <p class="mb-0"><strong>เบอร์โทรศัพท์ / Line ID:</strong> <span class="text-success fw-bold">@Model.PhoneNumber</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-light rounded d-flex justify-content-between align-items-center border">
+                <div>
+                    <span class="fw-semibold">การจัดการรายการสิ่งของ:</span>
+                </div>
+
+                @if (Model.Status != LostAndFound.Models.ItemStatus.Returned && Model.Status != LostAndFound.Models.ItemStatus.Claimed)
+                {
+                    <form asp-action="MarkAsReturned" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('ยืนยันว่าส่งคืนสิ่งของชิ้นนี้/มีผู้มารับเรียบร้อยแล้วใช่หรือไม่?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success rounded-pill fw-bold">
+                            <i class="bi bi-check-circle-fill me-1"></i> กดเมื่อมีคนรับของแล้ว
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button class="btn btn-secondary rounded-pill fw-bold" disabled>
+                        <i class="bi bi-check-all me-1"></i> รายการนี้มีผู้รับไปแล้ว
+                    </button>
+                }
+            </div>
+
+            <div class="d-flex justify-content-between mt-4 pt-2 border-top">
+                <a asp-action="Index" class="btn btn-outline-secondary px-4 rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
