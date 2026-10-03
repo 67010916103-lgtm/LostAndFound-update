@@ -6,9 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register ApplicationDbContext
+// Register ApplicationDbContext (เปลี่ยนจาก UseSqlServer มาใช้ UseInMemoryDatabase)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseInMemoryDatabase("LostAndFoundDb"));
 
 var app = builder.Build();
 
@@ -16,7 +16,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -31,13 +30,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Item}/{action=Index}/{id?}");
 
-// ทำการหุ้ม try-catch ป้องกันโปรแกรมดับเมื่อยังไม่ได้เชื่อมต่อ Database บน Cloud
+// ทำการสร้างข้อมูลเริ่มต้น (Categories)
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<LostAndFound.Data.ApplicationDbContext>();
-        if (context.Database.CanConnect() && !context.Categories.Any())
+        context.Database.EnsureCreated(); // สร้างฐานข้อมูลจำลองในแรม
+
+        if (!context.Categories.Any())
         {
             context.Categories.AddRange(
                 new LostAndFound.Models.Category { Name = "อุปกรณ์อิเล็กทรอนิกส์" },
@@ -51,7 +52,6 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        // หากเชื่อมต่อฐานข้อมูลไม่ได้ ให้ข้ามไปรันแอปตามปกติ
         Console.WriteLine($"Database initialization bypassed: {ex.Message}");
     }
 }
